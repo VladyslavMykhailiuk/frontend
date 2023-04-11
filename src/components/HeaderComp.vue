@@ -13,7 +13,10 @@
         <div class="text-end">
           <router-link v-if="!loggedIn" to="/login" class="btn btn-outline-light me-2">Ввійти</router-link>
           <router-link v-if="!loggedIn" to="/register" class="btn btn-warning">Зареєструватися</router-link>
-          <button v-if="loggedIn" type="button" class="btn btn-outline-light m-2" @click.prevent="logout">Вийти</button>
+          <div v-if="loggedIn" class="d-flex align-items-center">
+              <div class="m-2">{{ user.name }}</div>
+              <button type="button" class="btn btn-outline-light m-2" @click.prevent="logout">Вийти</button>
+          </div>
         </div>
       </div>
     </div>
@@ -38,9 +41,8 @@ export default {
         },
     },
     computed: {
-        ...mapState(useAuthStore, ["loggedIn"])
-    },
+        ...mapState(useAuthStore, ["loggedIn","user"])
+    }
 }
-
 
 </script>

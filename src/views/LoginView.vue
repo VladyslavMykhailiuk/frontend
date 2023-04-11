@@ -6,23 +6,25 @@
           <div class="card bg-dark text-white" style="border-radius: 1rem;">
             <div class="card-body p-5 text-center">
 
-              <div class="mb-md-5 mt-md-4 pb-5">
+              <form class="mb-md-5 mt-md-4 pb-5">
 
                 <h2 class="fw-bold mb-2 text-uppercase">Вхід</h2>
                 <p class="text-white-50 mb-5">Будь ласка введіть вашу пошту та пароль!</p>
 
                 <div class="form-outline form-white mb-4">
-                  <input v-model="email" type="email" id="typeEmailX" class="form-control form-control-lg"/>
-                  <label class="form-label" for="typeEmailX">Пошта</label>
+                    <label class="form-label" for="typeEmailX">Пошта</label>
+                  <input  v-model="email" type="email" id="typeEmailX" class="form-control form-control-lg"  @input="validateEmail"/>
+                    <span class="text-danger">{{ emailError }}</span>
                 </div>
 
                 <div class="form-outline form-white mb-4">
-                  <input v-model="password" type="password" id="typePasswordX" class="form-control form-control-lg"/>
-                  <label class="form-label" for="typePasswordX">Пароль</label>
+                    <label class="form-label" for="typePasswordX">Пароль</label>
+                  <input v-model="password" type="password" id="typePasswordX" class="form-control form-control-lg" @input="validatePassword"/>
+                    <span class="text-danger">{{ passwordError }}</span>
                 </div>
                 <p class="small mb-5 pb-lg-2"><a class="text-white-50" href="#!">Забули пароль?</a></p>
                 <button class="btn btn-outline-light btn-lg px-5" type="submit" @click.prevent="sendCredentials">Ввійти</button>
-              </div>
+              </form>
 
               <div>
                 <p class="mb-0">Ще не маєте аккаунту? <router-link to="/register" class="text-white-50 fw-bold">Реєстрація</router-link></p>
@@ -48,6 +50,8 @@ export default {
     return {
       email: null,
       password: null,
+        emailError: null,
+        passwordError: null
     }
   },
 
@@ -56,17 +60,36 @@ export default {
     router() {
       return router
     },
+      validateEmail() {
+          if (!this.email) {
+              this.emailError = 'Ви нічого не ввели';
+          } else if (!/\S+@\S+\.\S+/.test(this.email)) {
+              this.emailError = 'Ввели некоректну пошту';
+          } else {
+              this.emailError = null;
+          }
+      },
+      validatePassword() {
+          if (!this.password) {
+              this.passwordError = 'Введіть ваш пароль';
+          } else {
+              this.passwordError = null;
+          }
+      },
     sendCredentials() {
-      const userData = {
-        'email':this.email,
-        'password':this.password,
-        'device_name' : 'desktop'
-      }
-      this.loginUser(userData);
+        this.validateEmail();
+        this.validatePassword();
+        if (!this.emailError && !this.passwordError) {
+            const userData = {
+                'email': this.email,
+                'password': this.password,
+                'device_name': 'desktop'
+            }
+            this.loginUser(userData)
+        }
     }
   },
 }
-
 
 </script>
 

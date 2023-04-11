@@ -1,5 +1,8 @@
 <template>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="input-group m-5 d-flex flex-column justify-content-center align-items-center">
+        <input v-model="searchQuery" type="search" class="form-control rounded input" placeholder="Пошук за назвою..." aria-label="Search" aria-describedby="search-addon" @input="handleSearch" />
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4" v-if="hotels.length>0">
         <div class="col" v-for="hotel in hotels" :key="hotel.id">
             <div class="card m-3" >
                 <img :src="hotel.main_image" class="card-img-top" alt="Hotel Photo">
@@ -12,6 +15,9 @@
             </div>
         </div>
     </div>
+    <div v-else>
+        <h1 class="text-center text-white">Уууупссс...нічого не знайдено, введіть вірну назву</h1>
+    </div>
 </template>
 
 <script>
@@ -23,15 +29,23 @@ export default {
     data() {
         return {
 hotels:[],
+            searchQuery: '',
         }
     },
 
     methods: {
-       getHotels() {
-           AxiosInstance.get('/hotels').then((response)=>{
-               this.hotels = response.data.data;
-           })
-       }
+        getHotels() {
+            AxiosInstance.get('/hotels', {
+                params: {
+                    search: this.searchQuery,
+                }
+            }).then((response) => {
+                this.hotels = response.data.data;
+            })
+        },
+        handleSearch() {
+            this.getHotels();
+        }
     },
     mounted() {
         this.getHotels();
@@ -41,8 +55,12 @@ hotels:[],
 
 </script>
 
-<style>
+<style scoped>
 .card-img-top {
     height: 300px;
+}
+
+.input {
+    width: 85% !important;
 }
 </style>

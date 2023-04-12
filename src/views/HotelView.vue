@@ -1,16 +1,6 @@
 <template>
     <div class="container">
-        <h2 class="fw-bold text-center mt-4">{{ hotel.name }}</h2>
-        <p class="fs-4 text-center">{{ hotel.city }}</p>
-        <div class="d-flex">
-            <div class="col-md-4 mb-4 m-5" v-for="image in hotel.images" :key="image.id" >
-                <img :src="image" alt="Hotel Photo" class="img-fluid rounded">
-            </div>
-        </div>
-        <p class="fs-5">{{ hotel.description }}</p>
-        <p class="fs-5">Адреса: {{ hotel.address }}</p>
-        <p class="fs-5">Кількість зірок: {{ hotel.stars }}</p>
-        <p class="fs-5">Середня ціна за ніч: {{ hotel.average_cost }}</p>
+        <display-hotel :hotel="hotel"/>
         <h1 class="mt-5 text-center">Фільтр:</h1>
         <div class="input-group m-5 d-flex flex-column justify-content-center align-items-center">
             <input v-model="countPersons" type="number" class=" mt-4 form-control rounded input" placeholder="К-сть персон..." @input="handleFilter"/>
@@ -22,30 +12,7 @@
                 <option value="desc">За спаданням</option>
             </select>
         </div>
-        <div v-if="rooms.length > 0">
-            <div class="card mb-3 mt-5 text-black" v-for="room in rooms" :key="room.id">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img :src="room.main_image" class=" p-3 img-fluid rounded-start" alt="Room Photo">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ room.name }}</h5>
-                            <p class="card-text">{{ room.description }}</p>
-                            <div><strong>Клас:</strong> {{ room.class }}</div>
-                            <div><strong>Кількість персон:</strong> {{ room.persons }}</div>
-                            <div><strong>Дата заїзду:</strong> {{ room.arrival_date }}</div>
-                            <div><strong>Дата виїзду:</strong> {{ room.departure_day }}</div>
-                            <div><strong>Ціна:</strong> {{ room.price }}грн</div>
-                            <button class="btn btn-danger mt-3" @click="showModal = true ; selectedRoom = room">Забронювати номер</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-5 text-center" v-else>
-            <h2>Ууууууппсс... пока порожньо, скоро щось з'явиться!</h2>
-        </div>
+        <display-rooms @modal-change="showModal = $event" @room-change="selectedRoom = $event" :rooms="rooms"></display-rooms>
         <h1 class="mt-5 text-center">Коментарі:</h1>
         <div v-if="hotelComments.length > 0">
             <div class="position-relative card mb-3 mt-5 text-black" v-for="hotelComment in hotelComments" :key="hotelComment.id">
@@ -88,6 +55,9 @@
     <modal-comp v-if="showSecondModal" @close="showSecondModal = false" :title="`Редагування коментарю`"  :confirmButton="`Редагувати`" @updateComment="updateComment(hotelCommentId)">
         <input v-model="commentInfo" type="text" class=" mt-4 form-control rounded input">
     </modal-comp>
+    <div class="d-flex justify-content-center align-items-center">
+        <button class="btn btn-danger m-2" @click="downloadPDF">Згенерувати PDF</button>
+    </div>
 </template>
 
 <script>
@@ -98,10 +68,13 @@ import router from "@/router/router";
 import Swal from 'sweetalert2';
 import {mapState} from "pinia";
 import {useAuthStore} from "@/stores/auth";
+import Pusher from "pusher-js";
+import DisplayHotel from "@/components/Hotel/DisplayHotel.vue";
+import DisplayRooms from "@/components/Hotel/DisplayRooms.vue";
 
 export default {
     name: "HotelView",
-    components: {ModalComp},
+    components: {DisplayRooms, DisplayHotel, ModalComp},
 
     data() {
         return {
@@ -300,6 +273,23 @@ export default {
                         this.showSecondModal = false;
                     }
                 })
+        },
+        downloadPDF() {
+            axiosInstance.get(`/pdf-download/${this.$route.params.id}`)
+                .then(() => {
+                    const pusher = new Pusher('82615ddfc1722620e052', {
+                        cluster: 'eu',
+                        useTLS: true
+                    });
+
+                    const channel = pusher.subscribe('mint-salute-672');
+                    channel.bind('pdf-ready', data => {
+                        window.open(data.url, '_blank');
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
 
     },

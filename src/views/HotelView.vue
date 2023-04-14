@@ -153,6 +153,16 @@ export default {
 
             axiosInstance.post('/reserve-room', data)
                 .then(() => {
+                    AxiosInstance.post('/add-reservation',{
+                        hotel_id:this.selectedRoom.hotel_id,
+                        name:this.selectedRoom.name,
+                        class:this.selectedRoom.class,
+                        persons:this.selectedRoom.persons,
+                        price:this.selectedRoom.price,
+                        arrival_date:this.selectedRoom.arrival_date,
+                        departure_day:this.selectedRoom.departure_day,
+                    }).then(()=>{
+                    })
                     this.showModal = false;
                     Swal.fire({
                         position: 'center',
@@ -209,7 +219,7 @@ export default {
                 });
         },
         updateComment(commentId){
-            if(this.user.id === this.hotelCommentUserId || this.user.role_id !== 3) {
+            if(Object.keys(this.user).length !== 0 && (this.user.id === this.hotelCommentUserId || this.user.role_id !== 3)) {
                 axiosInstance.put(`/hotelComments/${commentId}`, {
                     hotel_id: this.hotelCommentHotelId,
                     description: this.commentInfo,
@@ -252,7 +262,7 @@ export default {
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Так, видалити коментар!'
                 }).then((result) => {
-                    if (result.isConfirmed && this.user.id === this.hotelCommentUserId || this.user.role_id !== 3) {
+                    if (result.isConfirmed && (Object.keys(this.user).length !== 0 && (this.user.id === this.hotelCommentUserId || this.user.role_id !== 3))){
                         axiosInstance.delete(`/hotelComments/${commentId}`).then(() => {
                             this.getHotelComments(this.$route.params.id);
                             Swal.fire(

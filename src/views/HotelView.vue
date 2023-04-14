@@ -161,7 +161,7 @@ export default {
                         showConfirmButton: false,
                         timer: 1500
                     })
-                    router.push('/')
+                    router.push('/hotels')
                 })
                 .catch(() => {
                 });
@@ -209,7 +209,7 @@ export default {
                 });
         },
         updateComment(commentId){
-            if(this.user.id === this.hotelCommentUserId) {
+            if(this.user.id === this.hotelCommentUserId || this.user.role_id !== 3) {
                 axiosInstance.put(`/hotelComments/${commentId}`, {
                     hotel_id: this.hotelCommentHotelId,
                     description: this.commentInfo,
@@ -252,7 +252,7 @@ export default {
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Так, видалити коментар!'
                 }).then((result) => {
-                    if (result.isConfirmed && this.user.id === this.hotelCommentUserId) {
+                    if (result.isConfirmed && this.user.id === this.hotelCommentUserId || this.user.role_id !== 3) {
                         axiosInstance.delete(`/hotelComments/${commentId}`).then(() => {
                             this.getHotelComments(this.$route.params.id);
                             Swal.fire(

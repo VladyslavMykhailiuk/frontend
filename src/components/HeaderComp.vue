@@ -15,6 +15,7 @@
           <router-link v-if="!loggedIn" to="/register" class="btn btn-warning">Зареєструватися</router-link>
           <div v-if="loggedIn" class="d-flex align-items-center">
               <div class="m-2">{{ user.name }}</div>
+              <a v-if="user.role_id !== 3" class="btn btn-danger" href="http://localhost:85/admin" target="_blank">Адмін панель</a>
               <button type="button" class="btn btn-outline-light m-2" @click.prevent="logout">Вийти</button>
           </div>
         </div>
@@ -42,6 +43,9 @@ export default {
     },
     computed: {
         ...mapState(useAuthStore, ["loggedIn","user"])
+    },
+    mounted() {
+        console.log(this.user)
     }
 }
 

@@ -22,14 +22,12 @@
                   <input v-model="password" type="password" id="typePasswordX" class="form-control form-control-lg" @input="validatePassword"/>
                     <span class="text-danger">{{ passwordError }}</span>
                 </div>
-                <p class="small mb-5 pb-lg-2"><a class="text-white-50" href="#!">Забули пароль?</a></p>
                 <button class="btn btn-outline-light btn-lg px-5" type="submit" @click.prevent="sendCredentials">Ввійти</button>
               </form>
 
               <div>
                 <p class="mb-0">Ще не маєте аккаунту? <router-link to="/register" class="text-white-50 fw-bold">Реєстрація</router-link></p>
               </div>
-
             </div>
           </div>
         </div>

@@ -161,6 +161,8 @@ export default {
                         price:this.selectedRoom.price,
                         arrival_date:this.selectedRoom.arrival_date,
                         departure_day:this.selectedRoom.departure_day,
+                        person_name:this.personName,
+                        person_email:this.personEmail
                     }).then(()=>{
                     })
                     this.showModal = false;
